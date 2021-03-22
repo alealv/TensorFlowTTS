@@ -17,7 +17,7 @@
 import abc
 import json
 import os
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Iterator
 
 from dataclasses import dataclass, field
 
@@ -42,7 +42,7 @@ class BaseProcessor(abc.ABC):
     saved_mapper_path: str = None
     loaded_mapper_path: str = None
     # extras
-    items: List[List[str]] = field(default_factory=list)  # text, wav_path, speaker_name
+    items: List[Iterator[str]] = field(default_factory=list)  # text, wav_path, speaker_name
     symbol_to_id: Dict[str, int] = field(default_factory=dict)
     id_to_symbol: Dict[int, str] = field(default_factory=dict)
 
@@ -159,7 +159,7 @@ class BaseProcessor(abc.ABC):
         return sample
 
     @abc.abstractmethod
-    def text_to_sequence(self, text: str):
+    def text_to_sequence(self, text: str) -> Iterator:
         return []
 
     @abc.abstractmethod

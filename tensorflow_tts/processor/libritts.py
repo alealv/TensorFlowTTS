@@ -28,9 +28,7 @@ from tensorflow_tts.processor.base_processor import BaseProcessor
 g2p = grapheme_to_phonem.G2p()
 
 valid_symbols = g2p.phonemes
-valid_symbols.append("SIL")
-valid_symbols.append("END")
-
+_special = ["SIL", "END"]
 _punctuation = "!'(),.:;? "
 _arpabet = ["@" + s for s in valid_symbols]
 
@@ -104,16 +102,10 @@ class LibriTTSProcessor(BaseProcessor):
         return self.clean_g2p(g2p(text))
 
     def clean_g2p(self, g2p_text: list):
-        data = []
-        for i, txt in enumerate(g2p_text):
-            if i == len(g2p_text) - 1:
-                if txt != " " and txt != "SIL":
-                    data.append("@" + txt)
-                else:
-                    data.append(
-                        "@END"
-                    )  # TODO try learning without end token and compare results
-                break
-            if txt != " ":
-                data.append("@" + txt) 
+        data = ["@".join(txt) for txt in g2p_text if txt != " "]
+
+        # Treat last character different
+        # TODO try learning without end token and compare results
+        data[-1] = "@END" if data[-1] in (" ", "@SIL") else data[-1]
+
         return data
